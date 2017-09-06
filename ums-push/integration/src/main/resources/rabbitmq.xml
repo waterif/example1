@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+     http://www.springframework.org/schema/beans/spring-beans.xsd
+     http://www.springframework.org/schema/rabbit
+     http://www.springframework.org/schema/rabbit/spring-rabbit-1.0.xsd">
+
+	<!--配置connection-factory，指定连接rabbit server参数 -->
+	<rabbit:connection-factory id="mqConnectionFactory"
+		username="${rabbit.mq.username}" 
+		password="${rabbit.mq.password}" 
+		host="${rabbit.mq.host}" 
+		port="${rabbit.mq.port}" />
+
+	<!-- 消息发送定义 START 这部分可以删掉 测试使用 -->
+	<!--定义rabbit template用于数据的接收和发送 -->
+	<rabbit:template id="amqpTemplate" connection-factory="mqConnectionFactory" 
+		exchange="exchangeTest"/>
+
+	<!--通过指定下面的admin信息，当前producer中的exchange和queue会在rabbitmq服务器上自动生成 -->
+	<rabbit:admin connection-factory="mqConnectionFactory" />
+	
+	<rabbit:topic-exchange name="exchangeTest">
+		<rabbit:bindings>
+			<rabbit:binding pattern="event.ums.#" queue="Notify-Queue-Default-ums-push"></rabbit:binding>
+		</rabbit:bindings>
+	</rabbit:topic-exchange>
+	<!-- 消息发送定义 END 这部分可以删掉 测试使用 -->
+	
+	<!--定义queue -->
+	<rabbit:queue name="Notify-Queue-Default-ums-push" durable="true" auto-delete="false"
+		exclusive="false" />
+
+	<!-- 消息接收者 -->
+	<bean id="messageReceiver" class="com.quanshi.ums.rabbitmq.MessageConsumer">
+		<property name="processor" ref="messageProcessor"/>
+	</bean>
+
+	<!-- queue litener 观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象 -->
+	<rabbit:listener-container
+		connection-factory="mqConnectionFactory">
+		<rabbit:listener queues="Notify-Queue-Default-ums-push" ref="messageReceiver" />
+	</rabbit:listener-container>
+
+</beans>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+	<!-- mybatis-generator:generate -->
+	<!-- <classPathEntry location="/Users/chinaxiang/.m2/repository/mysql/mysql-connector-java/5.1.41/mysql-connector-java-5.1.41.jar" /> -->
+	<classPathEntry location="C:/Users/yanxiang.huang/.m2/repository/mysql/mysql-connector-java/5.1.41/mysql-connector-java-5.1.41.jar" />
+
+	<context id="context1" defaultModelType="flat">
+
+		<property name="autoDelimitKeywords" value="true" />
+		<property name="beginningDelimiter" value="`" />
+		<property name="endingDelimiter" value="`" />
+		<property name="javaFileEncoding" value="UTF-8" />
+
+		<commentGenerator>
+			<property name="suppressAllComments" value="false" /><!-- 是否取消注释 -->
+		</commentGenerator>
+
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver"
+			connectionURL="jdbc:mysql://10.255.0.36:3306/ums" userId="root"
+			password="sqlums" />
+
+		<javaModelGenerator targetPackage="com.quanshi.ums.entity"
+			targetProject="ums-push">
+			<property name="constructorBased" value="false" />
+			<property name="trimStrings" value="true" />
+		</javaModelGenerator>
+
+		<sqlMapGenerator targetPackage="com.quanshi.ums.mapper"
+			targetProject="ums-push" />
+
+		<javaClientGenerator targetPackage="com.quanshi.ums.dao"
+			targetProject="ums-push" type="XMLMAPPER" />
+
+		<table schema="" tableName="ums_push_log"
+			domainObjectName="PushLog">
+			<generatedKey column="id" sqlStatement="MySql" identity="true" type="post"/>
+		</table>
+	</context>
+</generatorConfiguration>

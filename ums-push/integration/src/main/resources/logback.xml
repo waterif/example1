@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<!-- 日志文件大小 -->
+	<property name="log.max.size" value="100MB" />
+
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%X{req.requestId}] [%thread] [%-5level] [%logger{36}] - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="rollingFile"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>/var/log/tangjava/umspush.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>/var/log/tangjava/umspush.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<!-- 当天的日志大小 超过${log.max.size}时,压缩日志并保存 -->
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>${log.max.size}</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder>
+			<pattern>[host:%X{req.remoteHost}][%property{HOSTNAME}] [%d{yyyy-MM-dd HH:mm:ss.SSS}] [%X{req.requestId}] [%thread] [%-5level] [%logger{36}] - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
+		<syslogHost>localhost</syslogHost>
+		<facility>local6</facility>
+		<suffixPattern>[host:%X{req.remoteHost}][%property{HOSTNAME}] [%d{yyyy-MM-dd HH:mm:ss.SSS}] [%X{req.requestId}] [%thread] [%-5level] [%logger{36}] - %msg%n</suffixPattern>
+	</appender>
+	
+	<!-- 记录error日志 -->
+	<appender name="all_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+          <level>ERROR</level>
+          <onMatch>ACCEPT</onMatch>
+          <onMismatch>DENY</onMismatch>
+        </filter>
+       <file>/var/log/tangjava/umspush_error.log</file>
+       <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+         <fileNamePattern>/var/log/tangjava/umspush_error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>    
+         <MinIndex>1</MinIndex>    
+         <MaxIndex>5</MaxIndex>    
+	     <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">  
+	         <maxFileSize>${log.max.size}</maxFileSize>    
+	     </timeBasedFileNamingAndTriggeringPolicy>  
+       </rollingPolicy>  
+	   <encoder>
+			<pattern>[host:%X{req.remoteHost}][%property{HOSTNAME}] [%d{yyyy-MM-dd HH:mm:ss.SSS}] [%X{req.requestId}] [%thread] [%-5level] [%logger{36}] - %msg%n</pattern>
+	   </encoder> 
+    </appender>
+
+	<root>
+		<appender-ref ref="console" level="INFO"/>
+		<appender-ref ref="rollingFile" level="INFO"/>
+		<appender-ref ref="SYSLOG" level="INFO"/>
+		<appender-ref ref="all_error" level="ERROR" />
+	</root>
+	
+	<!-- spring -->
+	<logger name="org.springframework" level="ERROR" />
+	<logger name="org.thymeleaf" level="ERROR" />
+	<!-- mybatis -->
+	<logger name="org.apache.ibatis" level="ERROR" />
+	<logger name="org.mybatis" level="ERROR" />
+	<logger name="java.sql.Connection" level="ERROR" />
+	<logger name="java.sql.Statement" level="ERROR" />
+	<logger name="java.sql.PreparedStatement" level="ERROR" />
+	<logger name="java.sql.ResultSet" level="ERROR" /> 
+	
+	<!-- project default level -->
+	<logger name="com.quanshi.ums" level="INFO" />
+
+</configuration>
